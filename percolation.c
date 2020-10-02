@@ -225,14 +225,14 @@ void percolate(char option, double prob, int world_rank) {
                             for(int v=0; v<vtop; v++){
                                 if (!isvaluein2darraystruct(i, cluster_struct, ctop)){
                                 	//ctop is the current cluster
-    								cluster_struct[ctop].id = i;
-                                    cluster_struct[ctop].size = vtop;
-    								//copies the columns and rows of the cluster to the struct array
-    								for(int k=0;k<coltop;k++) cluster_struct[ctop].cols[k] = col_arr[k];
-    								for(int k=0;k<rowtop;k++) cluster_struct[ctop].rows[k] = row_arr[k];
-    								//keeps track of how many rows and columns the cluster covers
-    								cluster_struct[ctop].rowtop = rowtop;
-    								cluster_struct[ctop++].coltop = coltop;
+					cluster_struct[ctop].id = i;
+                                    	cluster_struct[ctop].size = vtop;
+					//copies the columns and rows of the cluster to the struct array
+					for(int k=0;k<coltop;k++) cluster_struct[ctop].cols[k] = col_arr[k];
+					for(int k=0;k<rowtop;k++) cluster_struct[ctop].rows[k] = row_arr[k];
+					//keeps track of how many rows and columns the cluster covers
+					cluster_struct[ctop].rowtop = rowtop;
+					cluster_struct[ctop++].coltop = coltop;
                                 }
                                 //boundaries of grid
                                 int lrb = ((id+1)*(split/nthreads) + split*(world_rank-1))/L;
@@ -414,26 +414,26 @@ void percolate(char option, double prob, int world_rank) {
 
 
 				for(int i=0;i<fc;i++){
-					if (final_cluster[i].id == final_cluster[r2].id){
-						nc = final_cluster[i].coltop;
-						nr = final_cluster[i].rowtop;
-						for(int j=0; j<nc;j++) 
-                                            		next_cols[j] = final_cluster[i].cols[j];
-						for(int k=0; k<nr;k++)
-							next_rows[k] = final_cluster[i].rows[k];
-					}
+				    if (final_cluster[i].id == final_cluster[r2].id){
+					nc = final_cluster[i].coltop;
+					nr = final_cluster[i].rowtop;
+					for(int j=0; j<nc;j++) 
+					    next_cols[j] = final_cluster[i].cols[j];
+					for(int k=0; k<nr;k++)
+					    next_rows[k] = final_cluster[i].rows[k];
+				    }
 				}
 				for(int i=0;i<fc;i++){
-					if (final_cluster[i].id == final_cluster[r].id){
-						for(int j=0; j<nc; j++){
-							if(!isvalueinarray(next_cols[j], final_cluster[i].cols, final_cluster[i].coltop))
-								final_cluster[i].cols[final_cluster[i].coltop++] = next_cols[j];  //one not in list
-						}
-						for(int q=0; q<nr; q++){
-							if(!isvalueinarray(next_rows[q], final_cluster[i].rows, final_cluster[i].rowtop))
-								final_cluster[i].rows[final_cluster[i].rowtop++] = next_rows[q];
-						}
+				    if (final_cluster[i].id == final_cluster[r].id){
+				        for(int j=0; j<nc; j++){
+					    if(!isvalueinarray(next_cols[j], final_cluster[i].cols, final_cluster[i].coltop))
+					        final_cluster[i].cols[final_cluster[i].coltop++] = next_cols[j];  //one not in list
 					}
+				        for(int q=0; q<nr; q++){
+					    if(!isvalueinarray(next_rows[q], final_cluster[i].rows, final_cluster[i].rowtop))
+					        final_cluster[i].rows[final_cluster[i].rowtop++] = next_rows[q];
+				        }
+				    }   
 				}
 
                                 for(int i=0; i<lamount[(id+1)%nthreads]; i++){
@@ -472,16 +472,16 @@ void percolate(char option, double prob, int world_rank) {
 					}
 				}
 				for(int i=0;i<fc;i++){
-					if (final_cluster[i].id == final_cluster[r2].id){
-						for(int j=0; j<nc; j++){
-							if(!isvalueinarray(next_cols[j], final_cluster[i].cols, final_cluster[i].coltop))
-								final_cluster[i].cols[final_cluster[i].coltop++] = next_cols[j];	
-						}
-						for(int j=0; j<nr; j++){
-							if(!isvalueinarray(next_rows[j], final_cluster[i].rows, final_cluster[i].rowtop))
-								final_cluster[i].rows[final_cluster[i].rowtop++] = next_rows[j];
-						}
+				    if (final_cluster[i].id == final_cluster[r2].id){
+					for(int j=0; j<nc; j++){
+					    if(!isvalueinarray(next_cols[j], final_cluster[i].cols, final_cluster[i].coltop))
+						final_cluster[i].cols[final_cluster[i].coltop++] = next_cols[j];	
 					}
+					for(int j=0; j<nr; j++){
+					    if(!isvalueinarray(next_rows[j], final_cluster[i].rows, final_cluster[i].rowtop))
+						final_cluster[i].rows[final_cluster[i].rowtop++] = next_rows[j];
+					}
+				    }
 				}
         
                                  for(int i=0; i<lamount[id]; i++){
