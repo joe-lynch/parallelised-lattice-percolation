@@ -87,8 +87,6 @@ void percolate(char option, double prob, int world_rank) {
     omp_set_num_threads(numthreads);
 
     if (option == 's'){
-        
-        
         int nthreads;
       
         //for original process, populate the lattice and send it to other processes
@@ -109,7 +107,6 @@ void percolate(char option, double prob, int world_rank) {
                     }       
                 }
             }
-            
             //send to every other process
             for(int i=1;i<=amountProcesses;i++){
                 MPI_Send(occ, N, MPI_INT, i, 0, MPI_COMM_WORLD);
@@ -120,7 +117,6 @@ void percolate(char option, double prob, int world_rank) {
             }
             free(occ);
         }
-
         else if (world_rank !=originProcess && world_rank <=amountProcesses && world_rank!=finalProcess) {
             //allocate arrays on the heap
             int (*nn)[4] = malloc(sizeof(int[N][4]));
@@ -395,11 +391,8 @@ void percolate(char option, double prob, int world_rank) {
                     }
 
                     for(int k=0; k<uamount[(id+1)%nthreads]; k++){
-                       
-
-                       //CHECKS IF THERE IS A SITES DIRECTLY UNDERNEATH CURRENT SITE IN NEXT THREAD
+                       //CHECKS IF THERE IS A SITE DIRECTLY UNDERNEATH CURRENT SITE IN NEXT THREAD
                         if (global_upper[(id+1)%nthreads][k].pos == next_pos){ 
-                          
                             int next_cols[split], nc=0, next_rows[split], nr=0;
 
                             //ADDING THE CLUSTER DIRECTLY BELOW
@@ -420,29 +413,28 @@ void percolate(char option, double prob, int world_rank) {
 
 
 
-								for(int i=0;i<fc;i++){
-									if (final_cluster[i].id == final_cluster[r2].id){
-										nc = final_cluster[i].coltop;
-										nr = final_cluster[i].rowtop;
-										for(int j=0; j<nc;j++) 
-                                            next_cols[j] = final_cluster[i].cols[j];
-										for(int k=0; k<nr;k++)
-											next_rows[k] = final_cluster[i].rows[k];
-									}
-								}
-								for(int i=0;i<fc;i++){
-									if (final_cluster[i].id == final_cluster[r].id){
-										for(int j=0; j<nc; j++){
-											if(!isvalueinarray(next_cols[j], final_cluster[i].cols, final_cluster[i].coltop))
-												final_cluster[i].cols[final_cluster[i].coltop++] = next_cols[j];  //one not in list
-										}
-										for(int q=0; q<nr; q++){
-											if(!isvalueinarray(next_rows[q], final_cluster[i].rows, final_cluster[i].rowtop))
-												final_cluster[i].rows[final_cluster[i].rowtop++] = next_rows[q];
-										}
-									}
-								}
-
+				for(int i=0;i<fc;i++){
+					if (final_cluster[i].id == final_cluster[r2].id){
+						nc = final_cluster[i].coltop;
+						nr = final_cluster[i].rowtop;
+						for(int j=0; j<nc;j++) 
+                                            		next_cols[j] = final_cluster[i].cols[j];
+						for(int k=0; k<nr;k++)
+							next_rows[k] = final_cluster[i].rows[k];
+					}
+				}
+				for(int i=0;i<fc;i++){
+					if (final_cluster[i].id == final_cluster[r].id){
+						for(int j=0; j<nc; j++){
+							if(!isvalueinarray(next_cols[j], final_cluster[i].cols, final_cluster[i].coltop))
+								final_cluster[i].cols[final_cluster[i].coltop++] = next_cols[j];  //one not in list
+						}
+						for(int q=0; q<nr; q++){
+							if(!isvalueinarray(next_rows[q], final_cluster[i].rows, final_cluster[i].rowtop))
+								final_cluster[i].rows[final_cluster[i].rowtop++] = next_rows[q];
+						}
+					}
+				}
 
                                 for(int i=0; i<lamount[(id+1)%nthreads]; i++){
                                     if (global_lower[(id+1)%nthreads][i].id == global_upper[(id+1)%nthreads][k].id)
@@ -460,8 +452,7 @@ void percolate(char option, double prob, int world_rank) {
                                 && !isvalueinarray(global_lower[id][j].id, visited_cluster, vc) && (id != numthreads-1)){
 
                                 visited_cluster[vc++] = global_lower[id][j].id;
-                                
-
+                               
                                 int r = returnvaluein3darraystruct(global_lower[id][j].id, final_cluster, fc);
                                 int r2 = returnvaluein3darraystruct(global_upper[(id+1)%nthreads][k].id, final_cluster, fc);
 
@@ -470,28 +461,28 @@ void percolate(char option, double prob, int world_rank) {
                                 
                                 final_cluster[r2].size += final_cluster[r].size;
 								
-								for(int i=0;i<fc;i++){
-									if (final_cluster[i].id == final_cluster[r].id){
-										nc = final_cluster[i].coltop;
-										nr = final_cluster[i].rowtop;
-										for(int j=0; j<nc;j++)
-											next_cols[j] = final_cluster[i].cols[j];
-										for(int j=0; j<nr;j++)
-											next_rows[j] = final_cluster[i].rows[j];
-									}
-								}
-								for(int i=0;i<fc;i++){
-									if (final_cluster[i].id == final_cluster[r2].id){
-										for(int j=0; j<nc; j++){
-											if(!isvalueinarray(next_cols[j], final_cluster[i].cols, final_cluster[i].coltop))
-												final_cluster[i].cols[final_cluster[i].coltop++] = next_cols[j];	
-										}
-										for(int j=0; j<nr; j++){
-											if(!isvalueinarray(next_rows[j], final_cluster[i].rows, final_cluster[i].rowtop))
-												final_cluster[i].rows[final_cluster[i].rowtop++] = next_rows[j];
-										}
-									}
-								}
+				for(int i=0;i<fc;i++){
+					if (final_cluster[i].id == final_cluster[r].id){
+						nc = final_cluster[i].coltop;
+						nr = final_cluster[i].rowtop;
+						for(int j=0; j<nc;j++)
+							next_cols[j] = final_cluster[i].cols[j];
+						for(int j=0; j<nr;j++)
+							next_rows[j] = final_cluster[i].rows[j];
+					}
+				}
+				for(int i=0;i<fc;i++){
+					if (final_cluster[i].id == final_cluster[r2].id){
+						for(int j=0; j<nc; j++){
+							if(!isvalueinarray(next_cols[j], final_cluster[i].cols, final_cluster[i].coltop))
+								final_cluster[i].cols[final_cluster[i].coltop++] = next_cols[j];	
+						}
+						for(int j=0; j<nr; j++){
+							if(!isvalueinarray(next_rows[j], final_cluster[i].rows, final_cluster[i].rowtop))
+								final_cluster[i].rows[final_cluster[i].rowtop++] = next_rows[j];
+						}
+					}
+				}
         
                                  for(int i=0; i<lamount[id]; i++){
                                     if (global_lower[id][i].id == global_upper[(id+1)%nthreads][k].id);
@@ -502,7 +493,7 @@ void percolate(char option, double prob, int world_rank) {
                             //ADDING THE VERY BORDERS AT THE TOP AND BOTTOM TOGETHER PROPERLY
                             else if (isvalueinarray(global_upper[(id+1)%nthreads][k].id, visited_cluster, vc) && id==(nthreads-1) && !isvalueinarray(global_lower[id][j].id, border_cluster, bc)){
 
-								border_cluster[bc++] = global_lower[id][j].id;
+				border_cluster[bc++] = global_lower[id][j].id;
 
                                 int r = returnvaluein3darraystruct(global_lower[id][j].id, final_cluster, fc);
                                 int r2 = returnvaluein3darraystruct(global_upper[(id+1)%nthreads][k].id, final_cluster, fc);
