@@ -8,7 +8,7 @@
 #include<limits.h>
 
 // define constants
-#define L 128
+#define L 46
 #define N (L*L)
 #define originProcess 0
 #define amountOfProcesses 2
@@ -126,10 +126,11 @@ void percolate(double prob, int world_rank) {
                 }       
             }
         }
+
         // send info to other processes
         for(int i=1; i<amountOfProcesses; i++){
         	// send the lattice
-        	printf("N:%d\n ",N);
+        	printf("\n%dx%d lattice.\n ",L, L);
         	MPI_Send(lattice, N, MPI_INT, i, 0, MPI_COMM_WORLD);
         	// calculate the split of the lattice and send it
         	int begin = 0;
@@ -138,7 +139,7 @@ void percolate(double prob, int world_rank) {
         	MPI_Send(vals, 2, MPI_INT, i, 0, MPI_COMM_WORLD);
         }
 
-        free(lattice);
+        //free(lattice);
 	}
 	// for all other processes...
 	else{
@@ -212,7 +213,7 @@ void percolate(double prob, int world_rank) {
 
         }
         printGrid(lattice);
-        printGrid(seen);
+        //printGrid(seen);
         free(lattice);
     	free(seen);
     	
@@ -224,7 +225,7 @@ void percolate(double prob, int world_rank) {
     		fprintf(stderr, "ERROR: No max cluster found");
     	}
 
-    	printf("Number of clusters: %d\n", listTop);
+    	printf("\nNumber of clusters: %d\n", listTop);
     	printf("Number of sites in biggest cluster: %d\n", maxSize);
     	printf("Row percolation: %s\n", row_perco ? "true" : "false");
     	printf("Col percolation: %s\n", col_perco ? "true" : "false");
