@@ -25,7 +25,8 @@ To use MPI with C, you must include mpi.h as a header. It can be included in you
 To use OpenMP, you must include omp.h as a header. It can be included in your C program with `#include <omp.h>`, you may need to directly reference its absolute path as well.
 
 ## How to run
-To compile the C file correctly, you should compile it with mpicc.\\
+To compile the C file correctly, you should compile it with mpicc.
+
 You can install this on linux by `sudo apt install openmpi-bin` and `sudo apt install libopenmpi-dev`.
 
 1. Download `percolation.c`.
