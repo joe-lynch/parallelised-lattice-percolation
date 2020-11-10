@@ -38,10 +38,11 @@ This runs the application with two processes, that each have 2 threads. The cons
 ## Scenarios
 
 ### Scenario 1
-A scenario with a 8x8 lattice with column percolation but not row percolation. The biggest cluster has 21 sites and performs the column percolation, the other two clusters are contained mostly in the bottom right. Note that clusters do not have a boundary and wrap around to the other side of the lattice.
+A scenario with a 8x8 lattice with column percolation but not row percolation. The biggest cluster has 21 sites and performs the column percolation, there are 3 total clusters. Note that clusters do not have a boundary and wrap around to the other side of the lattice.
 [![scenario 1](images/8x8.png)](images/8x8.png)
 
 ### Scenario 2
+A scenario with a 46x46 lattice where there is no row or column percolation. The seeding probability used was 0.3. The biggest cluster has X sites, with X clusters in total.
 [![scenario 2](images/46x46.png)](images/46x46.png)
 
 
