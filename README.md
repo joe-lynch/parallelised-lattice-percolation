@@ -47,5 +47,14 @@ A scenario with a 46x46 lattice where there is no row or column percolation. The
 
 [![scenario 2](images/46x46.png)](images/46x46.png)
 
+## Implementation
+Multiple processes are spawned when the program is executed. The first process requests input from the user for the seeding probability of the lattice to be generated. It then sends this probability to all other processes and each process calls the function `percolate(double prob, int world_rank)`. The first process generates the lattice, and computes how to split it between the processes, it sends the lattice and the respective split information to each process.
+
+Each process receives the lattice and which segment of the lattice it is responsible for. OpenMP parallel codeblocks are then used, and each process is split into multiple threads. The segment that a process is responsible for is further divided and each division is assigned to a thread, this managed by using `#pragma omp parallel` and `#pragma omp for schedule` which gives chunks of the for loop to each thread to perform.
+
+The for loop goes through the segment of the lattice and performs depth first search to find the clusters within the segment. `#pragma omp critical` is used when it is important that only one thread performs an action at a time, such as adding to the list of clusters that is shared between all threads. At the end the `#pragma omp critical` codeblock is used again to merge the clusters found by one thread with clusters found by another thread. Each thread only searched up to its boundaries, and therefore we look along the border of each segment, and merge the clusters into one cluster if there are adjacent sites.
+
+Finally, we compute the number of clusters, the size of the cluster with the most sites, and whether row and/or column percolation occurs.
+
 ## More information
 Princeton University has a [good introduction to MPI and OpenMP for C](https://princetonuniversity.github.io/PUbootcamp/sessions/parallel-programming/Intro_PP_bootcamp_2018.pdf). Visit [openmp.org](https://www.openmp.org/) for more information on OpenMP, and [open-mpi.org](https://www.open-mpi.org/) for more information on MPI. The wikipedia pages for [MPI](https://en.wikipedia.org/wiki/Open_MPI) and [OpenMP](https://en.wikipedia.org/wiki/OpenMP) are useful.
