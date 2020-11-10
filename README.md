@@ -19,10 +19,10 @@ MPI and OpenMP provide different functionalities. An application can be designed
 I will assume you are using Linux. If you are using Windows 10 you can also download the [Linux Subsystem for Windows](https://docs.microsoft.com/en-us/windows/wsl/install-win10) which is very useful.
 
 ### MPI
-To use MPI with C, you must include mpi.h as a header. It can be included in your c program with `#include <mpi.h>`, you may need to directly reference its absolute path such as `#include "/usr/include/mpi/mpi.h"`.
+To use MPI with C, you must include mpi.h as a header. It can be included in your C program with `#include <mpi.h>`, you may need to directly reference its absolute path such as `#include "/usr/include/mpi/mpi.h"`.
 
 ### OpenMP
-To use OpenMP, you must include omp.h as a header. It can be included in your c program with `#include <omp.h>`, you may need to directly reference its absolute path as well.
+To use OpenMP, you must include omp.h as a header. It can be included in your C program with `#include <omp.h>`, you may need to directly reference its absolute path as well.
 
 ## How to run
 To compile the C file correctly, you should compile it with mpicc.\\
