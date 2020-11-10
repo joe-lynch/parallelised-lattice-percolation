@@ -39,9 +39,9 @@ This runs the application with two processes, that each have 2 threads. The cons
 
 ### Scenario 1
 A scenario with a 8x8 lattice with column percolation but not row percolation. The biggest cluster has 21 sites and performs the column percolation, the other two clusters are contained mostly in the bottom right. Note that clusters do not have a boundary and wrap around to the other side of the lattice.
-[![scenario1.png](images/8x8.png)](images/8x8.png)
+[![8x8.png](images/8x8.png)](images/8x8.png)
 
 ### Scenario 2
-[![scenario2.png](images/46x46)](images/46x46)
+[![46x46.png](images/46x46.png)](images/46x46.png)
 
 
