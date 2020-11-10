@@ -1,6 +1,6 @@
 # lattice-percolation
 Lattice percolation in C using MPI and OpenMP for parallel computing.\\
-Percolation generally refers to when liquids filter through solid materials, such as water through coffee grounds. Percolation can also describe systems where nearest-neighbor interactions are important, such as the magnetic interaction between atoms in iron, or where bonds can be formed spontaneously, such as cross linking between polymers, leading to gels.\\
+Percolation generally refers to when liquids filter through solid materials, such as water through coffee grounds. Percolation can also describe systems where nearest-neighbor interactions are important, such as the magnetic interaction between atoms in iron, or where bonds can be formed spontaneously, such as cross linking between polymers, leading to gels.\
 This application focuses on an abstract version of this concept. A square NxN lattice is created consisting of N^2 sites. Each site can either be empty or filled. Clusters are defined as a collection of a filled neighbour sites, where sites to the north, east, south, and west of a site are neighbour sites. This application randomly fills a lattice, finds each cluster and then computes whether row and/or column percolation occurs. Row/column percolation is when a cluster occupies a site in every row/column. E.g. row percolation would be the equivalent water being poured into a lattice at the top, and following a path to the bottom. Column percolation is similar.
 
 ## Introduction
