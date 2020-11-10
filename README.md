@@ -23,9 +23,11 @@ To use OpenMP, you must include omp.h as a header. It can be included in your c 
 
 ## How to run
 To compile the C file correctly, you should compile it with mpicc.\\
-You can install this on linux by `sudo apt install openmpi-bin` and `sudo apt install libopenmpi1.3`.
+You can install this on linux by `sudo apt install openmpi-bin` and `sudo apt install libopenmpi-dev`.
 
 1. Download `percolation.c`.
 2. Enter `mpicc -o percolation percolation.c -fopenmp` to compile `percolation.c.`.
-3. Enter `mpirun -np 3 ./percolation` to execute the application.
+3. Enter `mpirun -np 2 ./percolation` to execute the application.
+
+This runs the application with two processes, who each have 2 threads. The constants in the program can be changed at your risk to modify how many threads per process are used.
 
