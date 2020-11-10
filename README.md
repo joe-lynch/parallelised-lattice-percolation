@@ -35,3 +35,12 @@ You can install this on linux by `sudo apt install openmpi-bin` and `sudo apt in
 
 This runs the application with two processes, that each have 2 threads. The constants in the program can be changed at your risk to modify how many threads per process and processes are used.
 
+## Scenarios
+
+### Scenario 1
+[![scenario1.png](images/8x8.png)](images/8x8.png)
+
+### Scenario 2
+[![scenario2.png](images/46x46)](images/46x46)
+
+
