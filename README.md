@@ -47,4 +47,5 @@ A scenario with a 46x46 lattice where there is no row or column percolation. The
 
 [![scenario 2](images/46x46.png)](images/46x46.png)
 
-
+## More information
+Princeton University has a [good introduction to MPI and OpenMP for C](https://princetonuniversity.github.io/PUbootcamp/sessions/parallel-programming/Intro_PP_bootcamp_2018.pdf). Visit [openmp.org](https://www.openmp.org/) for more information on OpenMP, and [open-mpi.org](https://www.open-mpi.org/) for more information on MPI. The wikipedia pages for [MPI](https://en.wikipedia.org/wiki/Open_MPI) and [OpenMP](https://en.wikipedia.org/wiki/OpenMP) are useful.
