@@ -7,6 +7,7 @@
 #include<string.h>
 #include<limits.h>
 
+// define constants
 #define L 128
 #define N (L*L)
 #define originProcess 0
@@ -14,21 +15,20 @@
 #define amountOfThreads 2
 #define split (N/amountOfProcesses)
 
+/* structure of coordinates */
 typedef struct coord{
 	int row;
 	int col;
 } COORD;
 
+/* structure of cluster, with the id, and coordinates within it */
 typedef struct cluster{
     int id;
     COORD pos[N];
     int length;
 } CLUSTER;
 
-// mpicc -o test test.c -fopenmp
-// mpirun -np 3 ./test
-
-
+/* function declarations */
 void printGrid(int[L][L]);
 void printClusters(CLUSTER[], int);
 void printCoords(COORD[], int);
@@ -36,7 +36,7 @@ void printArr(int[], int);
 
 void percolate(double, int);
 void dfs(int, int, int, int, int[L][L], int[L][L], CLUSTER[], int);
-CLUSTER* getCluster(int, CLUSTER[], int, int[L][L]);
+CLUSTER* getCluster(int, CLUSTER[], int);
 void mergeClusters(CLUSTER*, CLUSTER*, CLUSTER[], int*, int[L][L]);
 
 void doesPercolate(CLUSTER[], int, bool*, bool*);
@@ -48,6 +48,7 @@ int mod (int, int);
 double randomProb();
 
 
+
 int main() {
 	double prob;
 	MPI_Init(NULL, NULL);
@@ -56,6 +57,7 @@ int main() {
 	int world_rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
+	// get the probability of filling a site with '1', and call percolate() for all processes.
 	if(world_rank == originProcess){
 		printf("Enter a number for 0 to 1 from the seeding probability:\n");
         scanf("%lf", &prob);
@@ -71,11 +73,13 @@ int main() {
 }
 
 
+/* this performs all functionality of this application, it finds the amount of clusters in the lattice
+*  the size of greatest cluster, and whether row and/or column percolation occurs */
 void percolate(double prob, int world_rank) {
 	bool row_perco = false;
 	bool col_perco = false;	
 
-	// Depth First Search
+	/* Depth First Search function used to explore the lattice and build the clusters */
 	void dfs(int row, int col, int minEdge, int maxEdge, int lattice[L][L], int seen[L][L], CLUSTER cList[N], int idx){
 		if(row < minEdge || row >= maxEdge || seen[row][col] > 0 || lattice[row][col] == 0){
 			return;
@@ -94,7 +98,7 @@ void percolate(double prob, int world_rank) {
 		};
 		currCluster->length++;
 
-		// continue to go down the search tree recursively
+		// continue to explore the lattice recursively and build the cluster
 		dfs(mod(row+1, L), col, minEdge, maxEdge, lattice, seen, cList, idx);
 		dfs(mod(row-1, L), col, minEdge, maxEdge, lattice, seen, cList, idx);
 		dfs(row, mod(col+1, L), minEdge, maxEdge, lattice, seen, cList, idx);
@@ -104,6 +108,7 @@ void percolate(double prob, int world_rank) {
 	// set the number of threads per process
 	omp_set_num_threads(amountOfThreads);
 
+	// for the origin process...
 	if(world_rank == originProcess){
 		// set up the lattice
 		int (*lattice)[L] = malloc(sizeof(int[L][L]));
@@ -135,8 +140,8 @@ void percolate(double prob, int world_rank) {
 
         free(lattice);
 	}
+	// for all other processes...
 	else{
-		// allocate arrays on the heap
         int (*lattice)[L] = malloc(sizeof(int[L][L]));
         // receive the lattice from the original process
 		MPI_Recv(lattice, N, MPI_INT, originProcess, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
@@ -145,18 +150,25 @@ void percolate(double prob, int world_rank) {
         MPI_Recv(vals, 2, MPI_INT, originProcess, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         int begin = vals[0];
         int end = vals[1];
+
         // initialise values
         CLUSTER (*clusterList) = calloc(N, sizeof(int[N]));
         int (*seen)[L] = calloc(N, sizeof(int[L][L]));
         int amountOfClusters = 1;
 		int listTop = 0;
 		int nthreads = 2;
+
+		/* split that process into threads, and perfrom this block in parallel
+		*  and share the variables in shared() across all threads */
         #pragma omp parallel shared(seen, amountOfClusters, clusterList, listTop)
         {
-        	int th = omp_get_thread_num();
-        	int beginRow = th*(end/nthreads)/L;
-        	int endRow = (th+1)*(end/nthreads)/L;
+        	// define the start and end of the rows each thread covers in the lattice
+        	int thr = omp_get_thread_num();
+        	int beginRow = thr*(end/nthreads)/L;
+        	int endRow = (thr+1)*(end/nthreads)/L;
 
+        	/* statically split the for loop for the two threads
+        	*  each thread does N/nthreads iterations */
         	#pragma omp for schedule(static, N/nthreads)
         	for(int i=begin; i<end; i++) {
 	    		int row = i/L;
@@ -173,17 +185,24 @@ void percolate(double prob, int world_rank) {
 	    		}
 			}
 
-			//stitch segments together
 			int idList[N];
 			int top_idList = 0;
+
+			/* Perform this code block such that only one thread performs it at a tim
+			*  Stitch the segments of the lattice that each thread worked on together
+			*  Go along the edges of the segments, and compare with the edges of the adjacent segments
+			*  Merge clusters together accordingly */
 			#pragma omp critical
 			{
+				// for each column in a row
 				for(int i=0; i<L; i++){
+					// if the current site and the site of the previous row are not empty, and are not part of the same cluster, then merge their clusters together
 					if(lattice[beginRow][i] != 0 && lattice[mod(beginRow-1, L)][i] != 0 && (seen[beginRow][i] != seen[mod(beginRow-1, L)][i])
 						&& (!contains(idList, top_idList, seen[beginRow][i]) || !contains(idList, top_idList, seen[mod(beginRow-1, L)][i]))) {
-						//get clusters that have sites meeting on the borders
-						CLUSTER* c1 = getCluster(seen[mod(beginRow-1, L)][i], clusterList, listTop, seen);
-						CLUSTER* c2 = getCluster(seen[beginRow][i], clusterList, listTop, seen);
+						//get the clusters that have these sites that meet on the edge of the segments
+						CLUSTER* c1 = getCluster(seen[mod(beginRow-1, L)][i], clusterList, listTop);
+						CLUSTER* c2 = getCluster(seen[beginRow][i], clusterList, listTop);
+						// the id of c1 will be the id of the merged cluster, so add it to the 'seen' array of cluster ids
 						idList[top_idList++] = c1->id;
 						// merge the clusters together in the list
 						mergeClusters(c1, c2, clusterList, &listTop, seen);
@@ -193,16 +212,18 @@ void percolate(double prob, int world_rank) {
 
         }
         printGrid(lattice);
+        printGrid(seen);
         free(lattice);
     	free(seen);
-    	//printGrid(seen);
-    	//printClusters(clusterList, listTop);
+    	
     	doesPercolate(clusterList, listTop, &row_perco, &col_perco);
     	int maxSize = maxCluster(clusterList, listTop);
     	free(clusterList);
+
     	if(maxSize < 0){
     		fprintf(stderr, "ERROR: No max cluster found");
     	}
+
     	printf("Number of clusters: %d\n", listTop);
     	printf("Number of sites in biggest cluster: %d\n", maxSize);
     	printf("Row percolation: %s\n", row_perco ? "true" : "false");
@@ -211,6 +232,7 @@ void percolate(double prob, int world_rank) {
 }
 
 
+/* assign boolean value to row_perco and col_perco depending if the lattice is row percolating or column percolating */
 void doesPercolate(CLUSTER list[], int top, bool* row_perco, bool* col_perco){
 	for(int i=0; i<top; i++){
 		int rowp[L] = {0};
@@ -228,6 +250,7 @@ void doesPercolate(CLUSTER list[], int top, bool* row_perco, bool* col_perco){
 	}
 }
 
+/* check if every element of an integer array is equal to the integer num */
 bool containsAll(int arr[L], int num){
 	for(int i=0; i<L; i++){
 		if(arr[i] != num){
@@ -237,6 +260,7 @@ bool containsAll(int arr[L], int num){
 	return true;
 }
 
+/* return the size of the cluster with the most sites */
 int maxCluster(CLUSTER list[N], int top){
 	int currMax = -1;
 	for(int i=0; i<top; i++){
@@ -247,7 +271,11 @@ int maxCluster(CLUSTER list[N], int top){
 	return currMax;
 }
 
-
+/* return whether an integer array contains an integer or not 
+*  list[N]: integer array
+*  top: the pointer for the array
+*  val: the integer to check for
+*/
 bool contains(int list[N], int top, int val){
 	for(int i=0; i<top; i++){
 		if(list[i] == val){
@@ -257,20 +285,18 @@ bool contains(int list[N], int top, int val){
 	return false;
 }
 
-CLUSTER* getCluster(int id, CLUSTER list[], int size, int seen[L][L]){
+/* get the cluster with the id */
+CLUSTER* getCluster(int id, CLUSTER list[], int size){
 	for(int i=0; i<size; i++){
 		if(list[i].id == id){
 			return &list[i];
 		}
 	}
 	fprintf(stderr, "ERROR: No cluster exists.\n");
-	fprintf(stderr, "Trying to find cluster with id: %d\n",id);
-	printf("seen: \n");
-	printGrid(seen);
-	printClusters(list, size);
 	exit(EXIT_FAILURE);
 }
 
+/* merge two clusters together */
 void mergeClusters(CLUSTER* c1, CLUSTER* c2, CLUSTER list[], int* size, int seen[L][L]){
 	//assign all values of cluster c2 to cluster c1, and upate seen grid
 	for(int i=0; i<c2->length; i++){
@@ -298,6 +324,7 @@ void mergeClusters(CLUSTER* c1, CLUSTER* c2, CLUSTER list[], int* size, int seen
 	}
 }
 
+/* find the modulus and handle negatives */
 int mod (int a, int b)
 {
    if(b < 0)
@@ -308,11 +335,12 @@ int mod (int a, int b)
    return ret;
 }
 
+/* return a random number between 0 and 1 */
 double randomProb(){
     return (double)rand()/(double)RAND_MAX;
 }
 
-/*Prints the grid in ASCII to the terminal*/
+/* prints the grid in ASCII to the terminal*/
 void printGrid(int lattice[L][L]){
     for(int i = 0; i < L; ++i){
         printf("\n");
@@ -323,7 +351,7 @@ void printGrid(int lattice[L][L]){
     printf("\n");
 }
 
-/*Prints the grid in ASCII to the terminal*/
+/* prints each cluster and the coordinates in each cluster */
 void printClusters(CLUSTER list[N], int listTop){
     for(int i=0; i<listTop; i++){
     	printf("cluster_id: %d\n", list[i].id);
@@ -332,6 +360,7 @@ void printClusters(CLUSTER list[N], int listTop){
     }
 }
 
+/* prints each coordinate in a array of coordinates */
 void printCoords(COORD pos[N], int length){
 	for(int i=0; i<length; i++){
 		printf("(%d,%d) | ", pos[i].row, pos[i].col);
@@ -339,6 +368,7 @@ void printCoords(COORD pos[N], int length){
 	printf("\n");
 }
 
+/* print the values of an array */
 void printArr(int arr[], int top){
 	printf("[");
 	for(int i=0; i<top; i++){
@@ -350,15 +380,7 @@ void printArr(int arr[], int top){
 	printf("]: %d \n", top);
 }
 
-        /*
-        int lattice[8][8] = {
-		    {1, 0, 0, 1, 1, 1, 1, 1},
-		    {1, 1, 0, 0, 0, 1, 0, 1},
-		    {1, 0, 0, 0, 0, 1, 0, 1},
-		    {0, 1, 1, 0, 0, 1, 0, 0},
-		    {0, 1, 1, 0, 0, 1, 0, 0},
-		    {0, 0, 0, 0, 0, 1, 0, 0},
-		    {0, 0, 0, 0, 0, 0, 1, 0},
-		    {0, 0, 0, 1, 0, 0, 1, 0}
-		};
-		*/
+
+/* use these commands to compile and execute the application */
+// mpicc -o percolation percolation.c -fopenmp
+// mpirun -np 3 ./percolation
