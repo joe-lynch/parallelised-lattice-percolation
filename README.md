@@ -42,7 +42,7 @@ A scenario with a 8x8 lattice with column percolation but not row percolation. T
 [![scenario 1](images/8x8.png)](images/8x8.png)
 
 ### Scenario 2
-A scenario with a 46x46 lattice where there is no row or column percolation. The seeding probability used was 0.3. The biggest cluster has X sites, with X clusters in total.
+A scenario with a 46x46 lattice where there is no row or column percolation. The seeding probability used was 0.3. The biggest cluster has 281 sites, and there are 19 clusters in total.
 [![scenario 2](images/46x46.png)](images/46x46.png)
 
 
