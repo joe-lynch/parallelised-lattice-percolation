@@ -188,7 +188,7 @@ void percolate(double prob, int world_rank) {
             int idList[N];
             int idTop = 0;
 
-            /* Perform this code block such that only one thread performs it at a tim
+            /* Perform this code block such that only one thread performs it at a time
             *  Stitch the segments of the lattice that each thread worked on together
             *  Go along the edges of the segments, and compare with the edges of the adjacent segments
             *  Merge clusters together accordingly */
