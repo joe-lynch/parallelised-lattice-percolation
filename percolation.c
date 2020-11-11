@@ -250,8 +250,6 @@ void doesPercolate(CLUSTER list[], int top, bool* row_perco, bool* col_perco){
     }
 }
 
-
-
 /* check if every element of an integer array is equal to the integer num */
 bool containsAll(int arr[L], int num){
     for(int i=0; i<L; i++){
@@ -273,11 +271,7 @@ int maxCluster(CLUSTER list[N], int top){
     return currMax;
 }
 
-/* return whether an integer array contains an integer or not 
-*  list[N]: integer array
-*  top: the pointer for the array
-*  val: the integer to check for
-*/
+/* return whether an integer array contains an integer or not */
 bool contains(int list[N], int top, int val){
     for(int i=0; i<top; i++){
         if(list[i] == val){
@@ -342,7 +336,7 @@ double randomProb(){
     return (double)rand()/(double)RAND_MAX;
 }
 
-/* prints the grid in ASCII to the terminal*/
+/* prints a square grid */
 void printGrid(int lattice[L][L]){
     for(int i = 0; i < L; ++i){
         printf("\n");
