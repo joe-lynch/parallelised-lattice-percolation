@@ -209,10 +209,10 @@ void percolate(double prob, int world_rank) {
                     }
                 }
             }
-
         }
+
         printGrid(lattice);
-        //printGrid(seen);
+        
         free(lattice);
         free(seen);
         
