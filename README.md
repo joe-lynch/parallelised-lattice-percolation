@@ -13,7 +13,7 @@ The MPI Standard is a message passing library standard. The goal of MPI is to pr
 OpenMP (Open Multi-Processing) is an API that supports multi-platform shared-memory multiprocessing programming in C.
 
 ### Why are we using both?
-MPI and OpenMP provide different functionalities. An application can be designed with a hybrid model of parallel programming in mind. This allows us to run the program on a computer cluster using both OpenMP and MPI. OpenMP is used for parallelism within a (multi-core) node, while MPI is used for parallelism between nodes. In other words, we use MPI to run multiple separate processes, and send and receive information between those processes. We then use OpenMP to run multiple threads per process, and share information between those threads.
+MPI and OpenMP provide different functionalities. An application can be designed with a hybrid model of parallel programming in mind. This allows us to run the program on a computer cluster using both OpenMP and MPI. OpenMP is used for parallelism within a (multi-core) node, while MPI is used for parallelism between nodes. In other words, we use MPI to run multiple separate processes, and send and receive information between those processes. We use OpenMP to run multiple threads per process, and share information between those threads.
 
 ## Requirements
 I will assume you are using Linux. If you are using Windows 10 you can also download the [Linux Subsystem for Windows](https://docs.microsoft.com/en-us/windows/wsl/install-win10) which is very useful.
