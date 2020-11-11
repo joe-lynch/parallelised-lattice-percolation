@@ -19,21 +19,22 @@ MPI and OpenMP provide different functionalities. An application can be designed
 I will assume you are using Linux. If you are using Windows 10 you can also download the [Linux Subsystem for Windows](https://docs.microsoft.com/en-us/windows/wsl/install-win10) in order to use linux.
 
 ### MPI
-To use MPI with C, you must include mpi.h as a header. It can be included in your C program with `#include <mpi.h>`, you may need to directly reference its absolute path such as `#include "/usr/include/mpi/mpi.h"`.
+To use MPI with C, you must include mpi.h as a header. It can be included in your C program with `#include <mpi.h>`, you may need to directly reference its absolute path such as `#include "/usr/include/mpi/mpi.h"`. If necessary edit the header of `percolation.c` and change the header to point to the location of `mpi.h` on your machine.
 
 ### OpenMP
-To use OpenMP, you must include omp.h as a header. It can be included in your C program with `#include <omp.h>`, you may need to directly reference its absolute path as well.
+To use OpenMP, you must include omp.h as a header. It can be included in your C program with `#include <omp.h>`, you may need to directly reference its absolute path as well. If necessary, edit the header of `percolation.c` and change the header to point to the location of `omp.h` on your machine.
 
 ## How to run
 To compile the C file correctly, you should compile it with mpicc.
 
-You can install this on linux by `sudo apt install openmpi-bin` and `sudo apt install libopenmpi-dev`.
+You can install this on linux by running `sudo apt install openmpi-bin` and `sudo apt install libopenmpi-dev`.
 
-1. Download `percolation.c`.
+1. Download `percolation.c`. from this GitHub repository.
+2. Ensure that you have installed `openmpi-bin` and `libopenmpi-dev`.
 2. Enter `mpicc -o percolation percolation.c -fopenmp` to compile `percolation.c.`.
 3. Enter `mpirun -np 2 ./percolation` to execute the application.
 
-This runs the application with two processes, that each have 2 threads. The constants in the program can be changed at your risk to modify how many threads per process and processes are used.
+This runs the application with two processes (change the number after `-np` to change the amount of processes), that each have 2 threads. The constants in the program can be changed at your risk to modify how many threads per process and processes are used.
 
 ## Scenarios
 
