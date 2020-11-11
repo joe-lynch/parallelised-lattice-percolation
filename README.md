@@ -31,8 +31,9 @@ You can install this on linux by running `sudo apt install openmpi-bin` and `sud
 
 1. Download `percolation.c`. from this GitHub repository.
 2. Ensure that you have installed `openmpi-bin` and `libopenmpi-dev`.
-2. Enter `mpicc -o percolation percolation.c -fopenmp` to compile `percolation.c.`.
-3. Enter `mpirun -np 2 ./percolation` to execute the application.
+3. Navigate to the directory that contains `percolation.c`.
+2. Run `mpicc -o percolation percolation.c -fopenmp` to compile `percolation.c.` and generate the object file `percolation`.
+3. Run `mpirun -np 2 ./percolation` to execute the application.
 
 This runs the application with two processes (change the number after `-np` to change the amount of processes), that each have 2 threads. The constants in the program can be changed at your risk to modify how many threads per process and processes are used.
 
